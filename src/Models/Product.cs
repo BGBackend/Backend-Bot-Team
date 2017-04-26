@@ -5,7 +5,6 @@ namespace BackendBot.Models
     [Serializable]
     public class Product
     {
-        //ole
         public virtual int ProductId { get; set; }
         public virtual string Name { get; set; }
         public virtual string Description { get; set; }
