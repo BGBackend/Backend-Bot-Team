@@ -41,9 +41,7 @@ namespace BackendBot
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
-                // Handle conversation state changes, like members being added and removed
-                // Use Activity.MembersAdded and Activity.MembersRemoved and Activity.Action for info
-                // Not available in all channels
+                var reply = message.CreateReply("Hi! My name is Watson! How may I help you?");
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {

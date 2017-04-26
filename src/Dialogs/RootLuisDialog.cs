@@ -9,23 +9,28 @@ using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using BackendBot.Models;
+using LuisBot.Repositories;
 
 namespace BackendBot.Dialogs
 {
 
 
-    [LuisModel("99e3d255-88ea-4c78-8213-520b70e29fdf", "279f4f31fa6346219ce61e04a5cb34d6")]
+    [LuisModel("1ccd5054-73d5-40cc-99fc-4648d8ac5067", "279f4f31fa6346219ce61e04a5cb34d6")]
     [Serializable]
     public class RootLuisDialog : LuisDialog<object>
     {
         public string EntityProductName { get; private set; }
-        private IList<string> titleOptions = new List<string> {
-                    "Bullguard Internet Security",
-                    "Bullguard Premium Protection",
-                    "BullGuard Premium Services",
-                    "Bullguard Mobile Security",
-                    "Bullguard Antivirus"
-        };
+        private ResumptionCookie resumptionCookie;
+
+        public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+
+            if (this.resumptionCookie == null)
+            {
+                this.resumptionCookie = new ResumptionCookie(message);
+            }
+        }
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -38,59 +43,75 @@ namespace BackendBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
-        [LuisIntent("FindProducts")]
-        public async Task Search(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
-        {
-            var message = await activity;
-            await context.PostAsync($"Finding products: '{message.Text}'...");
-
-            var productsQuery = new ProductQuery();
-            var productsFormDialog = new FormDialog<ProductQuery>(productsQuery, this.BuildProductsForm, FormOptions.PromptInStart, result.Entities);
-
-            context.Call(productsFormDialog, this.ResumeAfterProductsFormDialog);
-        }
-
-        [LuisIntent("Refund")]
-        public async Task Reviews(IDialogContext context, LuisResult result)
-        {
-            EntityRecommendation productEntityRecommendation;
-
-            if (result.TryFindEntity(EntityProductName, out productEntityRecommendation))
-            {
-                await context.PostAsync($"Looking for '{productEntityRecommendation.Entity}' products...");
-
-                var resultMessage = context.MakeMessage();
-                resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                resultMessage.Attachments = new List<Attachment>();
-
-                for (int i = 0; i < 5; i++)
-                {
-                    var random = new Random(i);
-                    ThumbnailCard thumbnailCard = new ThumbnailCard()
-                    {
-                        Title = this.titleOptions[random.Next(0, this.titleOptions.Count - 1)],
-                        Text = "Description for...",
-                        Images = new List<CardImage>()
-                        {
-                            new CardImage() { Url = "https://www.bullguard.com/shop/Content/Img/Site2016/product_box_is.png" }
-                        },
-                    };
-
-                    resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
-                }
-
-                await context.PostAsync(resultMessage);
-            }
-
-            context.Wait(this.MessageReceived);
-        }
-
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
             await context.PostAsync("Hi! Try asking me things like 'I want a refund', 'I want to renew my subscription' or 'show me products'");
 
             context.Wait(this.MessageReceived);
+        }
+
+        //[LuisIntent("Renew")]
+        //public async Task Search(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        //{
+        //    var message = await activity;
+        //    await context.PostAsync($"I will help you with a refund. Please give me your email address.");
+
+        //    var productsQuery = new ProductQuery();
+        //    var productsFormDialog = new FormDialog<ProductQuery>(productsQuery, this.BuildProductsForm, FormOptions.PromptInStart, result.Entities);
+
+        //    context.Call(productsFormDialog, this.ResumeAfterProductsFormDialog);
+        //}
+
+        [LuisIntent("Refund")]
+        public async Task Refund(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync($"I will help you with refund your products. Please provide your email address.");
+
+            context.Wait(this.OnEmailProvided);
+        }
+
+        private async Task OnEmailProvided(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+            var userEmail = message.Text;
+            var user = new InMemoryUserRepository().GetByEmailAddress(userEmail);
+
+            if(user == null)
+            {
+                await context.PostAsync($"Couldn't find username. Would you like to try again?");
+            }
+            else
+            {
+                await context.PostAsync($"Hello {user.FullName}! These are your products.");
+            }
+        }
+
+        private async Task BuildProductsCarousel(IDialogContext context)
+        {
+            var resultMessage = context.MakeMessage();
+            resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            resultMessage.Attachments = new List<Attachment>();
+
+            var products = this.GetProducts();
+
+            foreach (Product product in products)
+            {
+                ThumbnailCard thumbnailCard = new ThumbnailCard()
+                {
+                    Title = product.Name,
+                    Text = product.Description,
+                    Subtitle = product.Price,
+                    Images = new List<CardImage>()
+                        {
+                            new CardImage() { Url = product.Image }
+                        },
+                };
+
+                resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
+            }
+
+            await context.PostAsync(resultMessage);
         }
 
         private IForm<ProductQuery> BuildProductsForm()
@@ -121,9 +142,7 @@ namespace BackendBot.Dialogs
         {
             try
             {
-                var searchQuery = await result;
-
-                var products = await this.GetProductsAsync(searchQuery);
+                var products = this.GetProducts();
 
                 await context.PostAsync($"I found {products.Count()} products:");
 
@@ -178,24 +197,9 @@ namespace BackendBot.Dialogs
             }
         }
 
-        private async Task<IEnumerable<Product>> GetProductsAsync(ProductQuery searchQuery)
+        private IEnumerable<Product> GetProducts()
         {
-            var products = new List<Product>();
-
-            //Retrieve these from a mock product repository
-            for (int i = 1; i <= 5; i++)
-            {
-                var random = new Random(i);
-                Product newProduct = new Product()
-                {
-                    Name = $"",
-                    Description = $"",
-                    Image = $"https://www.bullguard.com/shop/Content/Img/Site2016/product_box_av.png"
-                };
-
-                products.Add(newProduct);
-            }
-
+            var products = new InMemoryProductRepository().Find(null);
             return products;
         }
     }
