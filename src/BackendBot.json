@@ -1,17 +1,17 @@
 {
   "luis_schema_version": "1.3.0",
-  "name": "LuisBot",
-  "desc": "",
+  "name": "BackendBot",
+  "desc": "Bullguard Chat Bot",
   "culture": "en-us",
   "intents": [
     {
       "name": "None"
     },
     {
-      "name": "SearchHotels"
+      "name": "Refund"
     },
     {
-      "name": "ShowHotelsReviews"
+      "name": "Renew"
     },
     {
       "name": "Help"
@@ -19,17 +19,14 @@
   ],
   "entities": [
     {
-      "name": "Hotel"
+      "name": "Action"
     },
     {
-      "name": "AirportCode"
+      "name": "ProductName"
     }
   ],
   "composites": [],
   "closedLists": [],
-  "bing_entities": [
-    "geography"
-  ],
   "actions": [],
   "model_features": [
     {

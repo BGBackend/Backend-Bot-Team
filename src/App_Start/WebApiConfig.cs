@@ -1,9 +1,9 @@
-﻿namespace LuisBot
-{
-    using System.Web.Http;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
+﻿using System.Web.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
+namespace LuisBot
+{
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)

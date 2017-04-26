@@ -1,5 +1,5 @@
 # LUIS Bot Sample
- cvfghgfnfgnfgnfg
+
 A sample bot using LuisDialog to integrate with a LUIS.ai application.
 
 [![Deploy to Azure][Deploy Button]][Deploy CSharp/LUIS]
