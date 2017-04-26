@@ -41,7 +41,7 @@ namespace BackendBot
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
-                var reply = message.CreateReply("Hi! My name is Watson! How may I help you?");
+                var reply = message.CreateReply("Hi! My name is Winston! How may I help you?");
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {

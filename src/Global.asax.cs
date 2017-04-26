@@ -1,4 +1,4 @@
-﻿namespace LuisBot
+﻿namespace BackendBot
 {
     using System.Web.Http;
 

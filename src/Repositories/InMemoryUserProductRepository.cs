@@ -1,10 +1,10 @@
-﻿using LuisBot.Models;
+﻿using BackendBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace LuisBot.Repositories
+namespace BackendBot.Repositories
 {
     public class InMemoryUserProductRepository : InMemoryRepositoryBase<UserProduct>
     {
@@ -36,7 +36,7 @@ namespace LuisBot.Repositories
                        Expires = DateTime.Parse("05/05/2018"),
                        IsTemporary = false,
                        OrderId = 10001861,
-                       ProductId = 1,
+                       ProductId = 4,
                        TransitionType = TransitionType.ChangeProduct,
                    }
                );
@@ -50,7 +50,7 @@ namespace LuisBot.Repositories
                        Expires = DateTime.Parse("30/04/2019"),
                        IsTemporary = false,
                        OrderId = 10001861,
-                       ProductId = 1,
+                       ProductId = 2,
                        TransitionType = TransitionType.Upgrade,
                    }
                );
@@ -61,7 +61,7 @@ namespace LuisBot.Repositories
                        AutorenewEnabled = true,
                        Disabled = false,
                        EmailAddress = "anamaria.hudisteanu@bullguard.com",
-                       Expires = DateTime.Parse("30/04/2019"),
+                       Expires = DateTime.Parse("08/08/2017"),
                        IsTemporary = false,
                        OrderId = 10001861,
                        ProductId = 3,
@@ -78,7 +78,7 @@ namespace LuisBot.Repositories
                         Expires = DateTime.Parse("30/04/2019"),
                         IsTemporary = false,
                         OrderId = 10001861,
-                        ProductId = 1,
+                        ProductId = 5,
                         TransitionType = TransitionType.AutoRenew,
                     }
                 );
@@ -106,7 +106,35 @@ namespace LuisBot.Repositories
                        Expires = DateTime.Parse("30/04/2019"),
                        IsTemporary = false,
                        OrderId = 10001861,
-                       ProductId = 1,
+                       ProductId = 2,
+                       TransitionType = TransitionType.Upgrade,
+                   }
+               );
+            userProducts.Add(
+                   new UserProduct
+                   {
+                       UserProductId = 8,
+                       AutorenewEnabled = true,
+                       Disabled = false,
+                       EmailAddress = "anamaria.hudisteanu@bullguard.com",
+                       Expires = DateTime.Parse("30/04/2019"),
+                       IsTemporary = false,
+                       OrderId = 10001861,
+                       ProductId = 5,
+                       TransitionType = TransitionType.TrialConversion,
+                   }
+               );
+            userProducts.Add(
+                   new UserProduct
+                   {
+                       UserProductId = 7,
+                       AutorenewEnabled = false,
+                       Disabled = true,
+                       EmailAddress = "chatbot@bullguard.com",
+                       Expires = DateTime.Parse("30/04/2019"),
+                       IsTemporary = false,
+                       OrderId = 10001861,
+                       ProductId = 5,
                        TransitionType = TransitionType.Upgrade,
                    }
                );

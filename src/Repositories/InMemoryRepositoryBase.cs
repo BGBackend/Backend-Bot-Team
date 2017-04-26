@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace LuisBot.Repositories
+namespace BackendBot.Repositories
 {
     public abstract class InMemoryRepositoryBase<T> : IRepository<T>
     {

@@ -142,6 +142,7 @@
     <Compile Include="Repositories\InMemoryUserRepository.cs" />
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\PagedResult.cs" />
+    <Compile Include="Services\ProductsService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

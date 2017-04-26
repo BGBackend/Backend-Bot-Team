@@ -9,29 +9,15 @@ using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using BackendBot.Models;
-using LuisBot.Repositories;
+using BackendBot.Repositories;
 
 namespace BackendBot.Dialogs
 {
-
-
     [LuisModel("1ccd5054-73d5-40cc-99fc-4648d8ac5067", "279f4f31fa6346219ce61e04a5cb34d6")]
     [Serializable]
     public class RootLuisDialog : LuisDialog<object>
     {
-        public string EntityProductName { get; private set; }
-        private ResumptionCookie resumptionCookie;
-        private string EntityCredential = "Credential";
-
-        public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
-        {
-            var message = await result;
-
-            if (this.resumptionCookie == null)
-            {
-                this.resumptionCookie = new ResumptionCookie(message);
-            }
-        }
+        private const string EntityCredential = "Credential";
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -66,8 +52,8 @@ namespace BackendBot.Dialogs
 
             if (credentialEntity.Entity == "username")
             {
-                await context.PostAsync($"Let's recover your username. Could you please provide your product key or ordernumber?");
-                context.Wait(MessageReceived);
+                await context.PostAsync($"Let's recover your username. Could you please provide your product key or order number?");
+                context.Wait(OnRecoveryDataProvided);
             }
             else if (credentialEntity.Entity == "password")
             {
@@ -111,6 +97,7 @@ namespace BackendBot.Dialogs
                 else
                 {
                     await context.PostAsync($"Hello {user.FullName}! These are your products.");
+                    await LoadProducts(context);
                 }
             }
         }
@@ -142,13 +129,18 @@ namespace BackendBot.Dialogs
             }
         }
 
+        private Task OnRecoveryDataProvided(IDialogContext context, IAwaitable<object> result)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task BuildProductsCarousel(IDialogContext context)
         {
             var resultMessage = context.MakeMessage();
             resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
             resultMessage.Attachments = new List<Attachment>();
 
-            var products = this.GetProducts();
+            var products = Services.ProductsService.GetProducts();
 
             foreach (Product product in products)
             {
@@ -193,11 +185,11 @@ namespace BackendBot.Dialogs
                 .Build();
         }
 
-        private async Task ResumeAfterProductsFormDialog(IDialogContext context, IAwaitable<ProductQuery> result)
+        private async Task LoadProducts(IDialogContext context)
         {
             try
             {
-                var products = this.GetProducts();
+                var products = Services.ProductsService.GetProducts();
 
                 await context.PostAsync($"I found {products.Count()} products:");
 
@@ -252,10 +244,5 @@ namespace BackendBot.Dialogs
             }
         }
 
-        private IEnumerable<Product> GetProducts()
-        {
-            var products = new InMemoryProductRepository().FindAll();
-            return products;
-        }
     }
 }

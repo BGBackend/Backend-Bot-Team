@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace LuisBot
+namespace BackendBot
 {
     public static class WebApiConfig
     {
