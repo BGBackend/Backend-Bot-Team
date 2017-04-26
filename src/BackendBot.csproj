@@ -137,6 +137,7 @@
     <Content Include="packages.config" />
     <Content Include="BackendBot.json" />
     <Content Include="README.md" />
+    <None Include="Properties\PublishProfiles\BackendBot20170426032722 - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
