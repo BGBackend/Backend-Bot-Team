@@ -21,6 +21,7 @@ namespace BackendBot.Dialogs
     {
         public string EntityProductName { get; private set; }
         private ResumptionCookie resumptionCookie;
+        private string EntityCredential = "Credential";
 
         public virtual async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
@@ -46,27 +47,44 @@ namespace BackendBot.Dialogs
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hi! Try asking me things like 'I want a refund', 'I want to renew my subscription' or 'show me products'");
-
+            await context.PostAsync("Try to type anything to see if I can help you.");
             context.Wait(this.MessageReceived);
         }
 
-        //[LuisIntent("Renew")]
-        //public async Task Search(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
-        //{
-        //    var message = await activity;
-        //    await context.PostAsync($"I will help you with a refund. Please give me your email address.");
+        [LuisIntent("CredentialsSupport")]
+        public async Task FixCredentials(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        {
+            var message = await activity;
+            await context.PostAsync($"I will help you to retrieve your credentials.");
 
-        //    var productsQuery = new ProductQuery();
-        //    var productsFormDialog = new FormDialog<ProductQuery>(productsQuery, this.BuildProductsForm, FormOptions.PromptInStart, result.Entities);
+            EntityRecommendation credentialEntity;
 
-        //    context.Call(productsFormDialog, this.ResumeAfterProductsFormDialog);
-        //}
+            if (result.TryFindEntity(EntityCredential, out credentialEntity))
+            {
+                credentialEntity.Type = "Credential";
+            }
 
-        [LuisIntent("Refund")]
+            if (credentialEntity.Entity == "username")
+            {
+                await context.PostAsync($"Let's recover your username. Could you please provide your product key or ordernumber?");
+                context.Wait(MessageReceived);
+            }
+            else if (credentialEntity.Entity == "password")
+            {
+                await context.PostAsync($"Let's recover your password. What is your username?");
+                context.Wait(OnRecoveryEmailProvided);
+            }
+            else
+            {
+                await context.PostAsync($"Sorry, I do not know what credential {credentialEntity.Entity} is.");
+            }
+        }
+
+        [LuisIntent("DisableAR")]
         public async Task Refund(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync($"I will help you with refund your products. Please provide your email address.");
+            await context.PostAsync($"I will help you with disabling autorenewal.");
+            await context.PostAsync($" Please provide your email address:");
 
             context.Wait(this.OnEmailProvided);
         }
@@ -74,16 +92,53 @@ namespace BackendBot.Dialogs
         private async Task OnEmailProvided(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
             var message = await result;
-            var userEmail = message.Text;
-            var user = new InMemoryUserRepository().GetByEmailAddress(userEmail);
+            var userEmail = message.Text.ToLower();
 
-            if(user == null)
+
+            if (userEmail == "no")
             {
-                await context.PostAsync($"Couldn't find username. Would you like to try again?");
+                await context.PostAsync($"Is there anything else I can help you with?");
             }
             else
             {
-                await context.PostAsync($"Hello {user.FullName}! These are your products.");
+                var user = new InMemoryUserRepository().GetByEmailAddress(userEmail);
+
+                if (user == null)
+                {
+                    await context.PostAsync($"Couldn't find username {message.Text}. Would you like to try again?");
+                    context.Wait(OnEmailProvided);
+                }
+                else
+                {
+                    await context.PostAsync($"Hello {user.FullName}! These are your products.");
+                }
+            }
+        }
+
+        private async Task OnRecoveryEmailProvided(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+            var userEmail = message.Text.ToLower();
+
+
+            if (userEmail == "no")
+            {
+                await context.PostAsync($"Is there anything else I can help you with?");
+            }
+            else
+            {
+                var user = new InMemoryUserRepository().GetByEmailAddress(userEmail);
+
+                if (user == null)
+                {
+                    await context.PostAsync($"Couldn't find username {message.Text}. Would you like to try again?");
+                    context.Wait(OnRecoveryEmailProvided);
+                }
+                else
+                {
+                    await context.PostAsync($"Hello {user.FullName}! A password recovery email has been sent.");
+                    context.Wait(MessageReceived);
+                }
             }
         }
 
@@ -199,7 +254,7 @@ namespace BackendBot.Dialogs
 
         private IEnumerable<Product> GetProducts()
         {
-            var products = new InMemoryProductRepository().Find(null);
+            var products = new InMemoryProductRepository().FindAll();
             return products;
         }
     }
