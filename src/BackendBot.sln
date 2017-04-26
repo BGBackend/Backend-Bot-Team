@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5734D293
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendBot.Tests", "..\BackendBot.Tests\BackendBot.Tests.csproj", "{806A8E46-9A22-48D8-97F7-1FE5FB4BC83B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendBot.FunctionalTests", "BackendBot.FunctionalTests\BackendBot.FunctionalTests.csproj", "{E3BA55A5-F04A-49A4-838A-FFA9E0376BCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendBot.FunctionalTests", "..\BackendBot.FunctionalTests\BackendBot.FunctionalTests.csproj", "{E3BA55A5-F04A-49A4-838A-FFA9E0376BCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
