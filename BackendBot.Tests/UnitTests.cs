@@ -9,7 +9,7 @@ namespace BackendBot.Tests
         [TestMethod]
         public void OneEqualsOne_FromUnitTests()
         {
-            Assert.IsTrue(1 == 1);
+            Assert.IsTrue(1 == 2);
         }
     }
 }
