@@ -136,6 +136,8 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <Content Include="BackendBot.json" />
+    <Content Include="azuredeploy.json" />
+    <Content Include="README.md" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
