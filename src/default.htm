@@ -5,7 +5,8 @@
     <meta charset="utf-8" />
 </head>
 <body style="font-family:'Segoe UI'">
-    <h1>Bullguard Chat Bot</h1>
+    <h1>Winston ChatBot</h1>
+    <h2>by Backend Bot Team</h2>
     <p>This is a simple bot to help users obtain refunds quicker and easier.</p>
     <p>Visit <a href="https://www.bullguard.com/">Bullguard Website</a> for a full range of products.</p>
 </body>
@@ -15,8 +16,6 @@
         document.getElementsByTagName('body')[0].appendChild(div);
         div.outerHTML = "<div id= 'botDiv' style= 'height: 38px; position: fixed; bottom: 0; z-index: 1000; background-color: #fff' > <div id='botTitleBar' style='height: 38px; width: 400px; position:fixed; cursor: pointer;'></div><iframe width='400px' height='600px' src='https://webchat.botframework.com/embed/backendbot20170426032722?s=2LCl3XhNjM4.cwA.RgQ.FijBMFrZUx7VwDAP4T4F2pLwDwCX4mD64j9D5jjiiXo'></iframe></div>";
 
-
-        
 
         document.querySelector('body').addEventListener('click', function (e) {
             e.target.matches = e.target.matches || e.target.msMatchesSelector;
