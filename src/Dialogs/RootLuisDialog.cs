@@ -11,6 +11,8 @@ using Microsoft.Bot.Connector;
 using BackendBot.Models;
 using BackendBot.Repositories;
 using BackendBot.Services;
+using Microsoft.Bot.Builder.Resource;
+using Microsoft.Bot.Builder.FormFlow.Advanced;
 
 namespace BackendBot.Dialogs
 {
@@ -26,7 +28,6 @@ namespace BackendBot.Dialogs
         public async Task None(IDialogContext context, LuisResult result)
         {
             string message = $"Sorry, I did not understand '{result.Query}'. Type 'help' if you need assistance.";
-
             await context.PostAsync(message);
 
             context.Wait(this.MessageReceived);
@@ -37,6 +38,20 @@ namespace BackendBot.Dialogs
         {
             await context.PostAsync("Try to type anything to see if I can help you.");
             context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("Greeting")]
+        public async Task ProcessGreeting(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("Hello!");
+            context.Done(context);
+        }
+
+        [LuisIntent("NegativeAnswer")]
+        public async Task ProcessNegativeAnswer(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync("Thank you. Have a nice day!");
+            context.Done(context);
         }
 
         [LuisIntent("CredentialsSupport")]
@@ -55,7 +70,7 @@ namespace BackendBot.Dialogs
             if (credentialEntity.Entity == "username")
             {
                 await context.PostAsync($"Let's recover your username. Could you please provide your product key or order number?");
-                context.Wait(OnRecoveryDataProvided);
+                await OnRecoveryDataProvided(context);
             }
             else if (credentialEntity.Entity == "password")
             {
@@ -84,7 +99,7 @@ namespace BackendBot.Dialogs
             }
             else if (actionEntity.Entity == "purchase" || actionEntity.Entity == "buy")
             {
-                await context.PostAsync($"Please access the Bullguard Online shop at http://bullguard.com/shop.");
+                await BuildProductsCarousel(context);
             }
             else
             {
@@ -119,7 +134,6 @@ namespace BackendBot.Dialogs
         {
             var message = await result;
             var userEmail = message.Text.ToLower();
-
 
             if (userEmail == "no")
             {
@@ -179,7 +193,7 @@ namespace BackendBot.Dialogs
             }
         }
 
-        private async Task OnRecoveryDataProvided(IDialogContext context, IAwaitable<object> result)
+        private async Task OnRecoveryDataProvided(IDialogContext context)
         {
             await context.PostAsync("Unfortunately I cannot help you with this. Please contact support.");
             await OnFlowFinished(context);
@@ -195,45 +209,34 @@ namespace BackendBot.Dialogs
 
             foreach (Product product in products)
             {
-                ThumbnailCard thumbnailCard = new ThumbnailCard()
+                HeroCard heroCard = new HeroCard()
                 {
                     Title = product.Name,
-                    Text = product.Description,
                     Subtitle = product.Price,
+                    Text = product.Description,
                     Images = new List<CardImage>()
                         {
                             new CardImage() { Url = product.Image }
                         },
+                    Buttons = new List<CardAction>()
+                        {
+                            new CardAction()
+                            {
+                                Title = "Buy",
+                                Type = ActionTypes.OpenUrl,
+                                Value = "https://www.bullguard.com/shop"
+                            }
+                        }
                 };
 
-                resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
+
+
+
+                resultMessage.Attachments.Add(heroCard.ToAttachment());
             }
 
             await context.PostAsync(resultMessage);
-        }
-
-        private IForm<ProductQuery> BuildProductsForm()
-        {
-            OnCompletionAsyncDelegate<ProductQuery> processProductsSearch = async (context, state) =>
-            {
-                var message = "Searching for products";
-                if (!string.IsNullOrEmpty(state.ClientIdentifier))
-                {
-                    message += $" in {state.ClientIdentifier}...";
-                }
-                else if (!string.IsNullOrEmpty(state.ProductId))
-                {
-                    message += $" in {state.ProductId.ToUpperInvariant()}...";
-                }
-
-                await context.PostAsync(message);
-            };
-
-            return new FormBuilder<ProductQuery>()
-                .Field(nameof(ProductQuery.ClientIdentifier), (state) => string.IsNullOrEmpty(state.ProductId))
-                .Field(nameof(ProductQuery.ProductId), (state) => string.IsNullOrEmpty(state.ClientIdentifier))
-                .OnCompletion(processProductsSearch)
-                .Build();
+            await context.PostAsync("If you choose to buy a product from the list above you get a 20% discount!");
         }
 
         private async Task LoadUserProducts(IDialogContext context, string emailAddress)

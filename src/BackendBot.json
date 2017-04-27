@@ -15,10 +15,16 @@
       "name": "GeneralIntent"
     },
     {
+      "name": "Greeting"
+    },
+    {
       "name": "Help"
     },
     {
       "name": "MaliciousIntent"
+    },
+    {
+      "name": "NegativeAnswer"
     },
     {
       "name": "None"
@@ -30,6 +36,9 @@
     },
     {
       "name": "Credential"
+    },
+    {
+      "name": "Language"
     },
     {
       "name": "SwearWord"
@@ -203,6 +212,66 @@
     {
       "text": "fck you",
       "intent": "MaliciousIntent",
+      "entities": []
+    },
+    {
+      "text": "duck you",
+      "intent": "MaliciousIntent",
+      "entities": []
+    },
+    {
+      "text": "no, thanks",
+      "intent": "NegativeAnswer",
+      "entities": []
+    },
+    {
+      "text": "no, thank you",
+      "intent": "NegativeAnswer",
+      "entities": []
+    },
+    {
+      "text": "negative",
+      "intent": "NegativeAnswer",
+      "entities": []
+    },
+    {
+      "text": "nope",
+      "intent": "NegativeAnswer",
+      "entities": []
+    },
+    {
+      "text": "no",
+      "intent": "NegativeAnswer",
+      "entities": []
+    },
+    {
+      "text": "morning",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "good afternoon",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "good morning",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "good evening",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hi",
+      "intent": "Greeting",
+      "entities": []
+    },
+    {
+      "text": "hello",
+      "intent": "Greeting",
       "entities": []
     }
   ]
