@@ -12,13 +12,13 @@
       "name": "DisableAR"
     },
     {
+      "name": "GeneralIntent"
+    },
+    {
       "name": "Help"
     },
     {
       "name": "None"
-    },
-    {
-      "name": "Renew"
     }
   ],
   "entities": [
@@ -43,6 +43,12 @@
       "name": "autorenew",
       "mode": true,
       "words": "auto - renew,auto renew,autorenewal,auto renewal",
+      "activated": true
+    },
+    {
+      "name": "purchase",
+      "mode": true,
+      "words": "buy,pay",
       "activated": true
     },
     {
@@ -86,21 +92,6 @@
       "entities": []
     },
     {
-      "text": "i want to renew my subscription",
-      "intent": "Renew",
-      "entities": []
-    },
-    {
-      "text": "i want to extend my product",
-      "intent": "Renew",
-      "entities": []
-    },
-    {
-      "text": "renew my subscription",
-      "intent": "Renew",
-      "entities": []
-    },
-    {
       "text": "i don't want autorenew anymore",
       "intent": "DisableAR",
       "entities": []
@@ -134,6 +125,50 @@
           "entity": "Credential",
           "startPos": 20,
           "endPos": 27
+        }
+      ]
+    },
+    {
+      "text": "i want to renew my subscription",
+      "intent": "GeneralIntent",
+      "entities": [
+        {
+          "entity": "Action",
+          "startPos": 10,
+          "endPos": 14
+        }
+      ]
+    },
+    {
+      "text": "i want to renew",
+      "intent": "GeneralIntent",
+      "entities": [
+        {
+          "entity": "Action",
+          "startPos": 7,
+          "endPos": 14
+        }
+      ]
+    },
+    {
+      "text": "i would like to renew my subscription",
+      "intent": "GeneralIntent",
+      "entities": [
+        {
+          "entity": "Action",
+          "startPos": 16,
+          "endPos": 20
+        }
+      ]
+    },
+    {
+      "text": "i want to buy product",
+      "intent": "GeneralIntent",
+      "entities": [
+        {
+          "entity": "Action",
+          "startPos": 10,
+          "endPos": 12
         }
       ]
     }

@@ -128,7 +128,7 @@ namespace BackendBot.Repositories
             userProducts.Add(
                    new UserProduct
                    {
-                       UserProductId = 7,
+                       UserProductId = 9,
                        AutorenewEnabled = false,
                        Disabled = true,
                        EmailAddress = "chatbot@bullguard.com",
@@ -142,7 +142,7 @@ namespace BackendBot.Repositories
             userProducts.Add(
                    new UserProduct
                    {
-                       UserProductId = 8,
+                       UserProductId = 10,
                        AutorenewEnabled = true,
                        Disabled = false,
                        EmailAddress = "anamaria.hudisteanu@bullguard.com",

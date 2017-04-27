@@ -19,7 +19,7 @@ namespace BackendBot.Dialogs
     public class RootLuisDialog : LuisDialog<object>
     {
         private const string EntityCredential = "Credential";
-        private CurrentUserPreferences currentUserPreferences = new CurrentUserPreferences();
+        private const string EntityAction = "Action";
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -68,6 +68,40 @@ namespace BackendBot.Dialogs
             }
         }
 
+        [LuisIntent("GeneralIntent")]
+        public async Task ProcessIntents(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        {
+            var message = await activity;
+
+            EntityRecommendation actionEntity;
+
+            if (result.TryFindEntity(EntityAction, out actionEntity))
+            {
+                actionEntity.Type = "Action";
+            }
+
+            if (actionEntity.Entity == "renew")
+            {
+                await context.PostAsync($"I will help you with your product renewal.");
+                await context.PostAsync($"Please provide your email address:");
+                context.Wait(OnEmailProvided);
+            }
+            else if (actionEntity.Entity == "purchase" || actionEntity.Entity == "buy")
+            {
+                await context.PostAsync($"Please access the Bullguard Online shop at http://bullguard.com/shop.");
+            }
+            else if (actionEntity.Entity == "change product")
+            {
+                await context.PostAsync($"Please provide your email address:");
+                context.Wait(OnEmailProvided);
+            }
+            else
+            {
+                await context.PostAsync($"Sorry, I do not recognize {actionEntity.Entity} action.");
+            }
+            await OnFlowFinished(context);
+        }
+
         [LuisIntent("DisableAR")]
         public async Task DisableAutoRenew(IDialogContext context, LuisResult result)
         {
@@ -77,7 +111,7 @@ namespace BackendBot.Dialogs
             context.Wait(this.OnEmailProvided);
         }
 
-        private async Task OnFlowFinished(IDialogContext context, IAwaitable<IMessageActivity> result)
+        private async Task OnFlowFinished(IDialogContext context)
         {
             await context.PostAsync($"Is there anything else I can help you with?");
             context.Wait(MessageReceived);
@@ -91,7 +125,7 @@ namespace BackendBot.Dialogs
 
             if (userEmail == "no")
             {
-                context.Wait(OnFlowFinished);
+                await OnFlowFinished(context);
             }
             else
             {
@@ -104,9 +138,6 @@ namespace BackendBot.Dialogs
                 }
                 else
                 {
-                    currentUserPreferences.FullName = user.FullName;
-                    currentUserPreferences.EmailAddress = user.EmailAddress;
-
                     await context.PostAsync($"Hello {user.FullName}! These are your products.");
                     await LoadUserProducts(context, user.EmailAddress);
                 }
@@ -119,6 +150,7 @@ namespace BackendBot.Dialogs
             var userProduct = UserProductsService.GetUserProductyById(int.Parse(message.Text));
             var product = ProductsService.GetProductById(userProduct.ProductId);
             await context.PostAsync($"The autorenewal on your {product.Name} subscription has been successfully disabled.");
+            await OnFlowFinished(context);
             context.Done(userProduct);
         }
 
@@ -130,7 +162,7 @@ namespace BackendBot.Dialogs
 
             if (userEmail == "no")
             {
-                context.Wait(OnFlowFinished);
+                await OnFlowFinished(context);
             }
             else
             {
@@ -144,7 +176,7 @@ namespace BackendBot.Dialogs
                 else
                 {
                     await context.PostAsync($"Hello {user.FullName}! A password recovery email has been sent.");
-                    context.Wait(OnFlowFinished);
+                    await OnFlowFinished(context);
                 }
             }
         }
@@ -152,7 +184,7 @@ namespace BackendBot.Dialogs
         private async Task OnRecoveryDataProvided(IDialogContext context, IAwaitable<object> result)
         {
             await context.PostAsync("Unfortunately I cannot help you with this. Please contact support.");
-            context.Wait(OnFlowFinished);
+            await OnFlowFinished(context);
         }
 
         private async Task BuildProductsCarousel(IDialogContext context)
@@ -252,7 +284,7 @@ namespace BackendBot.Dialogs
                 else
                 {
                     await context.PostAsync("I am sorry, but I could not find any eligible products on your account.");
-                    context.Wait(OnFlowFinished);
+                    await OnFlowFinished(context);
                 }
             }
             catch (FormCanceledException ex)

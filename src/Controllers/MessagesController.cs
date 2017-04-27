@@ -7,6 +7,7 @@ using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using BackendBot.Dialogs;
+using System.Linq;
 
 namespace BackendBot
 {
@@ -41,9 +42,12 @@ namespace BackendBot
             }
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
-                var reply = message.CreateReply("Hi! My name is Winston! How may I help you?");
-                ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                if (message.MembersAdded.Any(o => o.Id == message.Recipient.Id))
+                {
+                    var reply = message.CreateReply("Hi! My name is Winston! How may I help you?");
+                    ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                    await connector.Conversations.ReplyToActivityAsync(reply);
+                }
 
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
