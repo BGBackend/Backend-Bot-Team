@@ -83,6 +83,12 @@
       "mode": true,
       "words": "renew,extend",
       "activated": true
+    },
+    {
+      "name": "username",
+      "mode": true,
+      "words": "account,credentials",
+      "activated": true
     }
   ],
   "regex_features": [],
@@ -145,6 +151,22 @@
         {
           "entity": "Credential",
           "startPos": 20,
+          "endPos": 27
+        }
+      ]
+    },
+    {
+      "text": "i want to recover my account",
+      "intent": "CredentialsSupport",
+      "entities": [
+        {
+          "entity": "Action",
+          "startPos": 10,
+          "endPos": 16
+        },
+        {
+          "entity": "Credential",
+          "startPos": 21,
           "endPos": 27
         }
       ]
