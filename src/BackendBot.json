@@ -18,6 +18,9 @@
       "name": "Help"
     },
     {
+      "name": "MaliciousIntent"
+    },
+    {
       "name": "None"
     }
   ],
@@ -27,6 +30,9 @@
     },
     {
       "name": "Credential"
+    },
+    {
+      "name": "SwearWord"
     }
   ],
   "composites": [],
@@ -43,6 +49,12 @@
       "name": "autorenew",
       "mode": true,
       "words": "auto - renew,auto renew,autorenewal,auto renewal",
+      "activated": true
+    },
+    {
+      "name": "Fuck",
+      "mode": true,
+      "words": "Idiot,Moron,Stupid",
       "activated": true
     },
     {
@@ -171,6 +183,27 @@
           "endPos": 12
         }
       ]
+    },
+    {
+      "text": "you are an idiot",
+      "intent": "MaliciousIntent",
+      "entities": [
+        {
+          "entity": "SwearWord",
+          "startPos": 11,
+          "endPos": 15
+        }
+      ]
+    },
+    {
+      "text": "fuck you",
+      "intent": "MaliciousIntent",
+      "entities": []
+    },
+    {
+      "text": "fck you",
+      "intent": "MaliciousIntent",
+      "entities": []
     }
   ]
 }

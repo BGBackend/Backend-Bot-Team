@@ -69,10 +69,8 @@ namespace BackendBot.Dialogs
         }
 
         [LuisIntent("GeneralIntent")]
-        public async Task ProcessIntents(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        public async Task ProcessIntents(IDialogContext context, LuisResult result)
         {
-            var message = await activity;
-
             EntityRecommendation actionEntity;
 
             if (result.TryFindEntity(EntityAction, out actionEntity))
@@ -83,22 +81,22 @@ namespace BackendBot.Dialogs
             if (actionEntity.Entity == "renew")
             {
                 await context.PostAsync($"I will help you with your product renewal.");
-                await context.PostAsync($"Please provide your email address:");
-                context.Wait(OnEmailProvided);
             }
             else if (actionEntity.Entity == "purchase" || actionEntity.Entity == "buy")
             {
                 await context.PostAsync($"Please access the Bullguard Online shop at http://bullguard.com/shop.");
             }
-            else if (actionEntity.Entity == "change product")
-            {
-                await context.PostAsync($"Please provide your email address:");
-                context.Wait(OnEmailProvided);
-            }
             else
             {
                 await context.PostAsync($"Sorry, I do not recognize {actionEntity.Entity} action.");
             }
+            await OnFlowFinished(context);
+        }
+
+        [LuisIntent("MaliciousIntent")]
+        public async Task ProcessMaliciousIntent(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync($"I hope you don't kiss your mother with that mouth.");
             await OnFlowFinished(context);
         }
 
