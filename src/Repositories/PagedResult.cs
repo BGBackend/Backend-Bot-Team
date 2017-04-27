@@ -5,9 +5,9 @@ using System.Web;
 
 namespace BackendBot.Repositories
 {
-    public class PagedResult<R>
+    public class PagedResult<T>
     {
-        public IEnumerable<R> Items { get; set; }
+        public IEnumerable<T> Items { get; set; }
 
         public int TotalCount { get; set; }
     }
