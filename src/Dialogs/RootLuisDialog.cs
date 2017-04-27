@@ -10,6 +10,7 @@ using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using BackendBot.Models;
 using BackendBot.Repositories;
+using BackendBot.Services;
 
 namespace BackendBot.Dialogs
 {
@@ -18,6 +19,7 @@ namespace BackendBot.Dialogs
     public class RootLuisDialog : LuisDialog<object>
     {
         private const string EntityCredential = "Credential";
+        private CurrentUserPreferences currentUserPreferences = new CurrentUserPreferences();
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -67,12 +69,18 @@ namespace BackendBot.Dialogs
         }
 
         [LuisIntent("DisableAR")]
-        public async Task Refund(IDialogContext context, LuisResult result)
+        public async Task DisableAutoRenew(IDialogContext context, LuisResult result)
         {
             await context.PostAsync($"I will help you with disabling autorenewal.");
             await context.PostAsync($" Please provide your email address:");
 
             context.Wait(this.OnEmailProvided);
+        }
+
+        private async Task OnFlowFinished(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            await context.PostAsync($"Is there anything else I can help you with?");
+            context.Wait(MessageReceived);
         }
 
         private async Task OnEmailProvided(IDialogContext context, IAwaitable<IMessageActivity> result)
@@ -83,7 +91,7 @@ namespace BackendBot.Dialogs
 
             if (userEmail == "no")
             {
-                await context.PostAsync($"Is there anything else I can help you with?");
+                context.Wait(OnFlowFinished);
             }
             else
             {
@@ -96,10 +104,22 @@ namespace BackendBot.Dialogs
                 }
                 else
                 {
+                    currentUserPreferences.FullName = user.FullName;
+                    currentUserPreferences.EmailAddress = user.EmailAddress;
+
                     await context.PostAsync($"Hello {user.FullName}! These are your products.");
-                    await LoadProducts(context);
+                    await LoadUserProducts(context, user.EmailAddress);
                 }
             }
+        }
+
+        private async Task OnUserProductDisableAutoRenewProvided(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+            var userProduct = UserProductsService.GetUserProductyById(int.Parse(message.Text));
+            var product = ProductsService.GetProductById(userProduct.ProductId);
+            await context.PostAsync($"The autorenewal on your {product.Name} subscription has been successfully disabled.");
+            context.Done(userProduct);
         }
 
         private async Task OnRecoveryEmailProvided(IDialogContext context, IAwaitable<IMessageActivity> result)
@@ -110,7 +130,7 @@ namespace BackendBot.Dialogs
 
             if (userEmail == "no")
             {
-                await context.PostAsync($"Is there anything else I can help you with?");
+                context.Wait(OnFlowFinished);
             }
             else
             {
@@ -124,14 +144,15 @@ namespace BackendBot.Dialogs
                 else
                 {
                     await context.PostAsync($"Hello {user.FullName}! A password recovery email has been sent.");
-                    context.Wait(MessageReceived);
+                    context.Wait(OnFlowFinished);
                 }
             }
         }
 
-        private Task OnRecoveryDataProvided(IDialogContext context, IAwaitable<object> result)
+        private async Task OnRecoveryDataProvided(IDialogContext context, IAwaitable<object> result)
         {
-            throw new NotImplementedException();
+            await context.PostAsync("Unfortunately I cannot help you with this. Please contact support.");
+            context.Wait(OnFlowFinished);
         }
 
         private async Task BuildProductsCarousel(IDialogContext context)
@@ -185,43 +206,54 @@ namespace BackendBot.Dialogs
                 .Build();
         }
 
-        private async Task LoadProducts(IDialogContext context)
+        private async Task LoadUserProducts(IDialogContext context, string emailAddress)
         {
             try
             {
-                var products = Services.ProductsService.GetProducts();
+                var userProducts = UserProductsService.GetUserProductyByEmailAddress(emailAddress).Select(up => new { up.UserProductId, up.ProductId, up.OrderId });
 
-                await context.PostAsync($"I found {products.Count()} products:");
+                await context.PostAsync($"I found {userProducts.Count()} products:");
 
-                var resultMessage = context.MakeMessage();
-                resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                resultMessage.Attachments = new List<Attachment>();
-
-                foreach (var product in products)
+                if (userProducts.Count() > 0)
                 {
-                    HeroCard heroCard = new HeroCard()
+                    var resultMessage = context.MakeMessage();
+                    resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                    resultMessage.Attachments = new List<Attachment>();
+
+                    foreach (var userProduct in userProducts)
                     {
-                        Title = product.Name,
-                        Subtitle = $"{product.Description}",
-                        Images = new List<CardImage>()
+                        var product = ProductsService.GetProductById(userProduct.ProductId);
+
+                        HeroCard heroCard = new HeroCard()
+                        {
+                            Title = product.Name,
+                            Subtitle = $"Order number: {userProduct.OrderId}",
+                            Images = new List<CardImage>()
                         {
                             new CardImage() { Url = product.Image }
                         },
-                        Buttons = new List<CardAction>()
+                            Buttons = new List<CardAction>()
                         {
                             new CardAction()
                             {
-                                Title = "More details",
-                                Type = ActionTypes.OpenUrl,
-                                Value = $"https://www.bullguard.com/shop/"
+                                Title = "Select",
+                                Type = ActionTypes.PostBack,
+                                Value = userProduct.UserProductId
                             }
                         }
-                    };
+                        };
 
-                    resultMessage.Attachments.Add(heroCard.ToAttachment());
+                        resultMessage.Attachments.Add(heroCard.ToAttachment());
+                    }
+
+                    await context.PostAsync(resultMessage);
+                    context.Wait(OnUserProductDisableAutoRenewProvided);
                 }
-
-                await context.PostAsync(resultMessage);
+                else
+                {
+                    await context.PostAsync("I am sorry, but I could not find any eligible products on your account.");
+                    context.Wait(OnFlowFinished);
+                }
             }
             catch (FormCanceledException ex)
             {
@@ -238,10 +270,10 @@ namespace BackendBot.Dialogs
 
                 await context.PostAsync(reply);
             }
-            finally
-            {
-                context.Done<object>(null);
-            }
+            //finally
+            //{
+            //    context.Done<object>(null);
+            //}
         }
 
     }

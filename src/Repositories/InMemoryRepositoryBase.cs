@@ -18,7 +18,8 @@ namespace BackendBot.Repositories
             };
         }
 
-        public abstract T GetByName(string name);
+        public abstract T FindById(int id);
+        public abstract T FindByName(string name);
 
         public abstract IEnumerable<T> Find(Func<T, bool> predicate);
 

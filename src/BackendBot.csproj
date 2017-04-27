@@ -11,7 +11,7 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LuisBot</RootNamespace>
+    <RootNamespace>BackendBot</RootNamespace>
     <AssemblyName>LuisBot</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
@@ -143,6 +143,7 @@
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\PagedResult.cs" />
     <Compile Include="Services\ProductsService.cs" />
+    <Compile Include="Services\UserProductsService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

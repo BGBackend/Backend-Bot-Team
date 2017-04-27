@@ -12,9 +12,9 @@ namespace BackendBot.Repositories
 
         public InMemoryProductRepository()
         {
-            this.products = new List<Product>();
+            products = new List<Product>();
 
-            this.products.Add(
+            products.Add(
                      new Product
                      {
                          ProductId = 1,
@@ -24,7 +24,7 @@ namespace BackendBot.Repositories
                          Price = "29.95 $"
                      }
                  );
-            this.products.Add(
+            products.Add(
                      new Product
                      {
                          ProductId = 2,
@@ -34,7 +34,7 @@ namespace BackendBot.Repositories
                          Price = "89.95 $"
                      }
                  );
-            this.products.Add(
+            products.Add(
                     new Product
                     {
                         ProductId = 3,
@@ -44,7 +44,7 @@ namespace BackendBot.Repositories
                         Price = "39.95 $"
                     }
                 );
-            this.products.Add(
+            products.Add(
                     new Product
                     {
                         ProductId = 4,
@@ -54,7 +54,7 @@ namespace BackendBot.Repositories
                         Price = "59.95 $"
                     }
                 );
-            this.products.Add(
+            products.Add(
                     new Product
                     {
                         ProductId = 5,
@@ -66,9 +66,9 @@ namespace BackendBot.Repositories
                 );
         }
 
-        public override Product GetByName(string name)
+        public override Product FindByName(string name)
         {
-            return this.products.SingleOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return products.SingleOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public override IEnumerable<Product> Find(Func<Product, bool> predicate)
@@ -79,6 +79,11 @@ namespace BackendBot.Repositories
         public override IEnumerable<Product> FindAll()
         {
             return products;
+        }
+
+        public override Product FindById(int id)
+        {
+            return products.SingleOrDefault(x => x.ProductId == id);
         }
     }
 }

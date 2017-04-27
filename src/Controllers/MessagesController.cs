@@ -25,14 +25,14 @@ namespace BackendBot
             }
             else
             {
-                this.HandleSystemMessage(activity);
+                await HandleSystemMessage(activity);
             }
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
 
-        private Activity HandleSystemMessage(Activity message)
+        private async Task HandleSystemMessage(Activity message)
         {
             if (message.Type == ActivityTypes.DeleteUserData)
             {
@@ -42,6 +42,9 @@ namespace BackendBot
             else if (message.Type == ActivityTypes.ConversationUpdate)
             {
                 var reply = message.CreateReply("Hi! My name is Winston! How may I help you?");
+                ConnectorClient connector = new ConnectorClient(new Uri(message.ServiceUrl));
+                await connector.Conversations.ReplyToActivityAsync(reply);
+
             }
             else if (message.Type == ActivityTypes.ContactRelationUpdate)
             {
@@ -54,9 +57,8 @@ namespace BackendBot
             }
             else if (message.Type == ActivityTypes.Ping)
             {
-            }
 
-            return null;
+            }
         }
     }
 }

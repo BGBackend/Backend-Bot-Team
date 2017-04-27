@@ -5,6 +5,7 @@ using System.Web;
 
 namespace BackendBot.Models
 {
+    [Serializable]
     public class CurrentUserPreferences
     {
         public string EmailAddress { get; set; }

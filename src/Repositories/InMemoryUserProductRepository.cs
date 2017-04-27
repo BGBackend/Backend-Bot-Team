@@ -19,13 +19,14 @@ namespace BackendBot.Repositories
                         AutorenewEnabled = true,
                         Disabled = false,
                         EmailAddress = "anamaria.hudisteanu@bullguard.com",
-                        Expires = DateTime.Parse("30/04/2019"),
+                        Expires = "30/04/2019",
                         IsTemporary = false,
                         OrderId = 10001861,
                         ProductId = 1,
                         TransitionType = TransitionType.AutoRenew,
                     }
                 );
+
             userProducts.Add(
                    new UserProduct
                    {
@@ -33,7 +34,7 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = false,
                        Disabled = false,
                        EmailAddress = "gabriel.mihaila@bullguard.com",
-                       Expires = DateTime.Parse("05/05/2018"),
+                       Expires = "05/05/2018",
                        IsTemporary = false,
                        OrderId = 10001861,
                        ProductId = 4,
@@ -47,7 +48,7 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = false,
                        Disabled = true,
                        EmailAddress = "chatbot@bullguard.com",
-                       Expires = DateTime.Parse("30/04/2019"),
+                       Expires = "30/04/2019",
                        IsTemporary = false,
                        OrderId = 10001861,
                        ProductId = 2,
@@ -60,8 +61,8 @@ namespace BackendBot.Repositories
                        UserProductId = 4,
                        AutorenewEnabled = true,
                        Disabled = false,
-                       EmailAddress = "anamaria.hudisteanu@bullguard.com",
-                       Expires = DateTime.Parse("08/08/2017"),
+                       EmailAddress = "calin.lencu@bullguard.com",
+                       Expires = "08/08/2017",
                        IsTemporary = false,
                        OrderId = 10001861,
                        ProductId = 3,
@@ -74,8 +75,8 @@ namespace BackendBot.Repositories
                         UserProductId = 5,
                         AutorenewEnabled = true,
                         Disabled = false,
-                        EmailAddress = "anamaria.hudisteanu@bullguard.com",
-                        Expires = DateTime.Parse("30/04/2019"),
+                        EmailAddress = "chatbot@bullguard.com",
+                        Expires = "30/04/2019",
                         IsTemporary = false,
                         OrderId = 10001861,
                         ProductId = 5,
@@ -89,7 +90,7 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = false,
                        Disabled = false,
                        EmailAddress = "gabriel.mihaila@bullguard.com",
-                       Expires = DateTime.Parse("05/05/2018"),
+                       Expires = "05/05/2018",
                        IsTemporary = false,
                        OrderId = 10001861,
                        ProductId = 1,
@@ -103,7 +104,7 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = false,
                        Disabled = true,
                        EmailAddress = "chatbot@bullguard.com",
-                       Expires = DateTime.Parse("30/04/2019"),
+                       Expires = "30/04/2019",
                        IsTemporary = false,
                        OrderId = 10001861,
                        ProductId = 2,
@@ -117,9 +118,9 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = true,
                        Disabled = false,
                        EmailAddress = "anamaria.hudisteanu@bullguard.com",
-                       Expires = DateTime.Parse("30/04/2019"),
+                       Expires = "30/04/2019",
                        IsTemporary = false,
-                       OrderId = 10001861,
+                       OrderId = 10001900,
                        ProductId = 5,
                        TransitionType = TransitionType.TrialConversion,
                    }
@@ -131,9 +132,9 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = false,
                        Disabled = true,
                        EmailAddress = "chatbot@bullguard.com",
-                       Expires = DateTime.Parse("30/04/2019"),
+                       Expires = "30/04/2019",
                        IsTemporary = false,
-                       OrderId = 10001861,
+                       OrderId = 10001888,
                        ProductId = 5,
                        TransitionType = TransitionType.Upgrade,
                    }
@@ -145,9 +146,9 @@ namespace BackendBot.Repositories
                        AutorenewEnabled = true,
                        Disabled = false,
                        EmailAddress = "anamaria.hudisteanu@bullguard.com",
-                       Expires = DateTime.Parse("30/04/2019"),
+                       Expires = "30/04/2019",
                        IsTemporary = false,
-                       OrderId = 10001861,
+                       OrderId = 10001765,
                        ProductId = 3,
                        TransitionType = TransitionType.TrialConversion,
                    }
@@ -164,9 +165,19 @@ namespace BackendBot.Repositories
             return userProducts;
         }
 
-        public override UserProduct GetByName(string name)
+        public override UserProduct FindById(int id)
+        {
+            return this.userProducts.SingleOrDefault(x => x.UserProductId == id);
+        }
+
+        public override UserProduct FindByName(string name)
         {
             throw new NotImplementedException();
+        }
+
+        public IEnumerable<UserProduct> GetByEmail(string emailAddress)
+        {
+            return userProducts.Where(up => up.EmailAddress.ToLower() == emailAddress.ToLower());
         }
     }
 }

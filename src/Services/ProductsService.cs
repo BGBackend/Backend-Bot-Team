@@ -15,9 +15,14 @@ namespace BackendBot.Services
             return _productRepository.FindAll();
         }
 
-        public static Product GetProductyByName(string productName)
+        public static Product GetProductByName(string productName)
         {
-            return _productRepository.GetByName(productName);
+            return _productRepository.FindByName(productName);
+        }
+
+        public static Product GetProductById(int id)
+        {
+            return _productRepository.FindById(id);
         }
     }
 }

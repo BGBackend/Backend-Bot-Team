@@ -8,10 +8,12 @@ namespace BackendBot.Repositories
 {
     public class InMemoryUserRepository : InMemoryRepositoryBase<User>
     {
-        public List<User> users = new List<User>();
+        public List<User> users;
 
         public InMemoryUserRepository()
         {
+            users = new List<User>();
+
             users.Add(
                 new User
                 {
@@ -51,7 +53,12 @@ namespace BackendBot.Repositories
             return users;
         }
 
-        public override User GetByName(string name)
+        public override User FindById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override User FindByName(string name)
         {
             return this.users.SingleOrDefault(x => x.FullName.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }

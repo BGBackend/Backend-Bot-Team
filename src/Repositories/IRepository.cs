@@ -9,6 +9,6 @@ namespace BackendBot.Repositories
     {
         PagedResult<T> RetrievePage(int pageNumber, int pageSize, Func<T, bool> predicate = default(Func<T, bool>));
 
-        T GetByName(string name);
+        T FindByName(string name);
     }
 }
